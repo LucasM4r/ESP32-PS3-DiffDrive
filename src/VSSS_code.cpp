@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <stdint.h>
 
-#define MAC MAC_ESP4
+#define MAC MAC_ESP5
 
 #define AIN1 18
 #define AIN2 5 
@@ -121,7 +121,9 @@ void findDifferentialGear()
         }
         else
         {
-            leftWheel = rightWheel = 0;
+            // Rotação no sentido horário (giro sobre o próprio eixo)
+            leftWheel = abs(diff);
+            rightWheel = abs(diff);
         }
     }
     else if (diff > 0)
@@ -133,7 +135,9 @@ void findDifferentialGear()
         }
         else
         {
-            leftWheel = rightWheel = 0;
+            // Rotação no sentido anti-horário (giro sobre o próprio eixo)
+            leftWheel = abs(diff);
+            rightWheel = abs(diff);
         }
     }
     else
@@ -186,13 +190,25 @@ void loop()
 
     if (acc < 0)
     {
-        moveEngine(1, leftWheel * 2, 1);
-        moveEngine(0, rightWheel * 2, 2);
+        moveEngine(0, leftWheel * 2, 1);
+        moveEngine(1, rightWheel * 2, 2);
     }
     else if (acc > 0)
     {
-        moveEngine(0, leftWheel * 2, 1);
+        moveEngine(1, leftWheel * 2, 1);
+        moveEngine(0, rightWheel * 2, 2);
+    }
+    else if (diff < 0)
+    {
+        // Rotação horária: motor esquerdo para frente, motor direito para trás
+        moveEngine(1, leftWheel * 2, 1);
         moveEngine(1, rightWheel * 2, 2);
+    }
+    else if (diff > 0)
+    {
+        // Rotação anti-horária: motor esquerdo para trás, motor direito para frente
+        moveEngine(0, leftWheel * 2, 1);
+        moveEngine(0, rightWheel * 2, 2);
     }
     else
     {
